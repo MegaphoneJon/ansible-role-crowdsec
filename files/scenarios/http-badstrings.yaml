@@ -1,0 +1,13 @@
+type: trigger
+name: MegaphoneJon/http-badstrings
+description: "Jon's list of bad strings"
+filter: 'evt.Meta.log_type in ["http_access-log", "http_error-log"] and any(File("badstrings.txt"), { evt.Parsed.file_name endsWith #})'
+data:
+  - source_url: https://security.megaphonetech.com/badstrings.txt
+    dest_file: badstrings.txt
+    type: string
+blackhole: 5m
+labels:
+  service: http
+  type: discovery
+  remediation: true

@@ -1,0 +1,47 @@
+- name: Install GPG key for Crowdsec repo
+  ansible.builtin.apt_key:
+    url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+    state: present
+
+- name: Add Crowdsec repo
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/any any main
+    state: present
+
+- name: Install Crowdsec and bouncer
+  apt:
+    update_cache: true
+    name:
+      - crowdsec
+      - crowdsec-firewall-bouncer-nftables
+    state: present
+  notify: restart crowdsec
+
+- name: Install custom scenarios
+  copy:
+    src: "{{ item }}"
+    dest: /etc/crowdsec/scenarios/
+  with_fileglob:
+      - files/scenarios/*
+  notify: restart crowdsec
+
+# Installs badstrings.txt
+- name: cscli hub upgrade
+  command:
+    cmd: cscli hub upgrade 
+  changed_when: false
+
+- name: Combine "users" and "additional users"
+  set_fact:
+    greenlist: "{{ greenlist_ips | union(additional_greenlist| default([])) }}"
+  tags: crowdtest
+
+- name: create allowlist
+  command:
+    cmd: "cscli allowlist create megaphone --description 'Megaphone IPs'"
+  failed_when: false
+  tags: crowdtest
+
+- name: add allowlist IPs to crowdsec
+  shell: "cscli allowlist add megaphone {{ greenlist|join(' ') }}"
+  tags: crowdtest
