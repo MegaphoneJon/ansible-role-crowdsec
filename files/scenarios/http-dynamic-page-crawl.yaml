@@ -8,8 +8,8 @@ filter: |
   evt.Parsed.verb == "GET" &&
   evt.Parsed.file_name != "admin-ajax.php" &&
   evt.Parsed.file_name != "post.php" &&
-  evt.Parsed.file_dir != "/civicrm/ajax/" &&
-  evt.Parsed.file_dir != "/civicrm/file/" &&
+  evt.Parsed.file_dir not startsWith "/civicrm/ajax/" &&
+  evt.Parsed.file_dir !=  "/civicrm/file/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/contact/" &&
   evt.Parsed.file_name not startsWith "/.well-known/acme-challenge" &&
   evt.Parsed.http_args not endsWith "preview=true"
