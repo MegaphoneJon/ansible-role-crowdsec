@@ -6,7 +6,6 @@ distinct: evt.Meta.http_path
 filter: |
   evt.Meta.service == "http" &&
   evt.Parsed.verb == "GET" &&
-  evt.Parsed.static_ressource == "false" &&
   evt.Parsed.file_name != "admin-ajax.php" &&
   evt.Parsed.file_name != "post.php" &&
   evt.Parsed.file_dir != "/civicrm/ajax/" &&
@@ -18,6 +17,9 @@ groupby: "evt.Meta.source_ip"
 blackhole: 5m
 capacity: 5
 leakspeed: 7s
+# Instead of filtering these out, we add them to the bucket so we can destroy the bucket when they're requested.
+# This allows us to "forgive" page loads for users downloading static resources.
+cancel_on: evt.Parsed.static_ressource == "true"
 labels:
   service: http
   type: headless-crawl
