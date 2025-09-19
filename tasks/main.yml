@@ -1,19 +1,32 @@
-- name: Install GPG key for Crowdsec repo
-  ansible.builtin.apt_key:
+- name: Download (armored) GPG key
+  ansible.builtin.get_url:
     url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
-    state: present
+    dest: /tmp/crowdsec.asc
 
-- name: Add Crowdsec repo
+- name: Convert CrowdSec key to dearmored format
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /etc/apt/keyrings/crowdsec.gpg /tmp/crowdsec.asc
+    creates: /etc/apt/keyrings/crowdsec.gpg
+
+
+- name: Add CrowdSec repository
   ansible.builtin.apt_repository:
-    repo: deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/any any main
+    repo: "deb [signed-by=/etc/apt/keyrings/crowdsec.gpg] https://packagecloud.io/crowdsec/crowdsec/any any main"
     state: present
+    filename: crowdsec
 
-- name: Install Crowdsec and bouncer
+- name: Install Crowdsec
   apt:
     update_cache: true
-    name:
-      - crowdsec
-      - crowdsec-firewall-bouncer-nftables
+    name: crowdsec
+    state: present
+  notify: restart crowdsec
+
+# Not sure why this works better when not installed simultaneously with crowdsec
+- name: Install bouncer
+  apt:
+    update_cache: true
+    name: crowdsec-firewall-bouncer-nftables
     state: present
   notify: restart crowdsec
 
