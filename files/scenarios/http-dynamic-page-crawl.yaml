@@ -3,12 +3,14 @@ name: MegaphoneJon/http-dynamic-page-crawl
 description: >
   Detect headless scrapers requesting multiple dynamic pages without fetching static assets.
 distinct: evt.Meta.http_path
+# Add "evt.Parsed.static_ressource == "false" &&" to the top of the filter when trying to ID which lines triggered the scenario.
 filter: |
   evt.Meta.service == "http" &&
   evt.Parsed.verb == "GET" &&
   evt.Parsed.file_name != "admin-ajax.php" &&
   evt.Parsed.file_name != "post.php" &&
   evt.Parsed.request not startsWith "/wp-admin/admin.php" &&
+  evt.Parsed.request not startsWith "/wp-json" &&
   evt.Parsed.file_dir != "/civicrm/report/instance/" &&
   evt.Parsed.file_dir != "/civicrm/mosaico/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/ajax/" &&
