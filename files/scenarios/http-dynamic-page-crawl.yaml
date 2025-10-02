@@ -13,6 +13,7 @@ filter: |
   evt.Parsed.request not startsWith "/wp-json" &&
   evt.Parsed.file_dir != "/civicrm/report/instance/" &&
   evt.Parsed.file_dir != "/civicrm/mosaico/" &&
+  evt.Parsed.file_dir != "/civicrm/asset/builder/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/ajax/" &&
   evt.Parsed.request not startsWith  "/civicrm/file" &&
   evt.Parsed.file_dir not startsWith "/civicrm/contact/" &&
