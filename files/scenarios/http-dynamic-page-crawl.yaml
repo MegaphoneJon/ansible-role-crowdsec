@@ -10,6 +10,7 @@ filter: |
   evt.Parsed.file_name != "admin-ajax.php" &&
   evt.Parsed.file_name != "post.php" &&
   evt.Parsed.request not startsWith "/wp-admin/admin.php" &&
+  evt.Parsed.request not startsWith "/wp-admin/edit.php" &&
   evt.Parsed.request not startsWith "/wp-json" &&
   evt.Parsed.file_dir != "/civicrm/report/instance/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/mosaico/" &&
