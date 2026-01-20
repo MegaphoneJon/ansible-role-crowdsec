@@ -38,6 +38,14 @@
       - files/scenarios/*
   notify: restart crowdsec
 
+- name: Install custom parsers
+  copy:
+    src: "{{ item }}"
+    dest: /etc/crowdsec/parsers/s02-enrich
+  with_fileglob:
+      - files/parsers/s02-enrich/*
+  notify: restart crowdsec
+
 # Installs badstrings.txt
 - name: cscli hub upgrade
   command:
