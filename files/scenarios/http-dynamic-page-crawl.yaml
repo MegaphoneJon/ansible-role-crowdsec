@@ -17,6 +17,7 @@ filter: |
   evt.Parsed.file_dir not startsWith "/civicrm/mosaico/" &&
   evt.Parsed.file_dir != "/civicrm/asset/builder/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/ajax/" &&
+  evt.Parsed.request not startsWith "/civicrm/admin/" &&
   evt.Parsed.request not startsWith "/civicrm/mailing/" &&
   evt.Parsed.request not startsWith  "/civicrm/file" &&
   evt.Parsed.request not startsWith  "/civicrm/custom" &&
