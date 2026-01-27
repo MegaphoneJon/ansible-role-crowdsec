@@ -9,6 +9,7 @@ filter: |
   evt.Parsed.verb == "GET" &&
   evt.Parsed.file_name != "admin-ajax.php" &&
   evt.Parsed.file_name != "post.php" &&
+  evt.Parsed.file_dir not endsWith "packages/kcfinder/" &&
   evt.Parsed.request not startsWith "/wp-admin/admin.php" &&
   evt.Parsed.request not startsWith "/wp-admin/edit.php" &&
   evt.Parsed.request not startsWith "/wp-json" &&
