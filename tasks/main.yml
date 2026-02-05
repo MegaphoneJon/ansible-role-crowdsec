@@ -54,15 +54,13 @@
 
 - name: Combine "users" and "additional users"
   set_fact:
-    greenlist: "{{ greenlist_ips | union(additional_greenlist| default([])) }}"
+    greenlist: "{{ greenlist_ips | union([ansible_host]) | union(additional_greenlist| default([])) }}"
   tags: crowdtest
 
 - name: create allowlist
   command:
     cmd: "cscli allowlist create megaphone --description 'Megaphone IPs'"
   failed_when: false
-  tags: crowdtest
 
 - name: add allowlist IPs to crowdsec
   shell: "cscli allowlist add megaphone {{ greenlist|join(' ') }}"
-  tags: crowdtest
