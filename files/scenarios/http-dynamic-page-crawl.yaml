@@ -15,6 +15,7 @@ filter: |
   evt.Parsed.request not startsWith "/wp-json" &&
   evt.Parsed.request not startsWith "/entity_reference_autocomplete" &&
   evt.Parsed.file_dir != "/civicrm/report/instance/" &&
+  evt.Parsed.file_dir != "/civicrm/asset/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/mosaico/" &&
   evt.Parsed.file_dir != "/civicrm/asset/builder/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/ajax/" &&
