@@ -28,6 +28,7 @@ filter: |
   evt.Meta.http_path not startsWith "/civicrm/contribute?reset=1" &&
   evt.Parsed.file_name not startsWith "/.well-known/acme-challenge" &&
   evt.Parsed.http_args not startsWith "q=user/autocomplete" &&
+  evt.Parsed.http_args not startsWith "q=taxonomy/autocomplete" &&
   evt.Parsed.http_args not endsWith "preview=true"
 groupby: "evt.Meta.source_ip"
 blackhole: 5m
