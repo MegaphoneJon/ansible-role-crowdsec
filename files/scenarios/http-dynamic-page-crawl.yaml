@@ -27,9 +27,12 @@ filter: |
   evt.Parsed.request not startsWith  "/webform-civicrm/" &&
   evt.Meta.http_path not startsWith "/civicrm/contribute?reset=1" &&
   evt.Parsed.file_name not startsWith "/.well-known/acme-challenge" &&
+  evt.Parsed.request not startsWith '/%3Fitok' &&
   evt.Parsed.http_args not startsWith "q=user/autocomplete" &&
   evt.Parsed.http_args not startsWith "q=taxonomy/autocomplete" &&
   evt.Parsed.http_args not endsWith "preview=true"
+# Temporary - only affects Drupal 7 - line with `itok`.
+# Temporary - we need a solution for all autocompletes - lines with `autocomplete`.
 groupby: "evt.Meta.source_ip"
 blackhole: 5m
 capacity: 5
