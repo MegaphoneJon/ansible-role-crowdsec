@@ -1,0 +1,12 @@
+type: trigger
+name: MegaphoneJon/http-bot-mitigations
+description: "Blocks for specific bad bot behavior"
+filter: "evt.Meta.log_type == 'http_access-log' && QueryUnescape(evt.Meta.http_path) contains QueryUnescape('amp%3Bamp%3B')"
+blackhole: 1m
+labels:
+  service: http
+  type: scan
+  remediation: true
+  label: "bad bot behavior"
+  spoofable: 0
+  confidence: 3
