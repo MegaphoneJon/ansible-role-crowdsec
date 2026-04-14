@@ -21,6 +21,8 @@ filter: |
   evt.Parsed.file_dir not startsWith "/civicrm/ajax/" &&
   evt.Parsed.request not startsWith "/civicrm/admin/" &&
   evt.Parsed.request not startsWith "/civicrm/mailing/" &&
+  evt.Parsed.request not startsWith "/civicrm/profile/view" &&
+  evt.Parsed.request not startsWith "/civicrm/group" &&
   evt.Parsed.request not startsWith  "/civicrm/file" &&
   evt.Parsed.request not startsWith  "/civicrm/custom" &&
   evt.Parsed.file_dir not startsWith "/civicrm/contact/" &&
