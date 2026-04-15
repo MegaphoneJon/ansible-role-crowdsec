@@ -44,7 +44,9 @@
     dest: /etc/crowdsec/parsers/s02-enrich
   with_fileglob:
       - files/parsers/s02-enrich/*
+      - "files/{{fqdn}}/crowdsec-custom/parsers/s02-enrich/*"
   notify: restart crowdsec
+  tags: parsers
 
 # Installs badstrings.txt
 - name: cscli hub upgrade
