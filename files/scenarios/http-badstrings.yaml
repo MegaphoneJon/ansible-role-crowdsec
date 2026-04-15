@@ -1,7 +1,7 @@
 type: trigger
 name: MegaphoneJon/http-badstrings
 description: "Jon's list of bad strings"
-filter: 'evt.Meta.log_type in ["http_access-log", "http_error-log"] and any(File("badstrings.txt"), { evt.Parsed.file_name endsWith #})'
+filter: 'evt.Meta.log_type in ["http_access-log", "http_error-log"] and any(File("badstrings.txt"), { evt.Meta.http_path endsWith #})'
 data:
   - source_url: https://security.megaphonetech.com/badstrings.txt
     dest_file: badstrings.txt
