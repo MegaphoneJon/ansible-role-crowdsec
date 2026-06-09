@@ -13,7 +13,6 @@ filter: |
   evt.Parsed.request not startsWith "/wp-admin/admin.php" &&
   evt.Parsed.request not startsWith "/wp-admin/edit.php" &&
   evt.Parsed.request not startsWith "/wp-json" &&
-  evt.Parsed.request not startsWith "/entity_reference_autocomplete" &&
   evt.Parsed.file_dir != "/civicrm/report/instance/" &&
   evt.Parsed.file_dir != "/civicrm/asset/" &&
   evt.Parsed.file_dir not startsWith "/civicrm/mosaico/" &&
@@ -30,8 +29,10 @@ filter: |
   evt.Meta.http_path not startsWith "/civicrm/contribute?reset=1" &&
   evt.Parsed.file_name not startsWith "/.well-known/acme-challenge" &&
   evt.Parsed.request not startsWith '/%3Fitok' &&
+  evt.Parsed.request not endsWith "autocomplete" &&
   evt.Parsed.http_args not startsWith "q=user/autocomplete" &&
   evt.Parsed.http_args not startsWith "q=taxonomy/autocomplete" &&
+  evt.Parsed.http_args not startsWith "q=civicrm_contact_ref" &&
   evt.Parsed.http_args not endsWith "preview=true"
 # Temporary - only affects Drupal 7 - line with `itok`.
 # Temporary - we need a solution for all autocompletes - lines with `autocomplete`.
