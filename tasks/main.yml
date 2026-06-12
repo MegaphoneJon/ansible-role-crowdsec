@@ -66,3 +66,48 @@
 
 - name: add allowlist IPs to crowdsec
   shell: "cscli allowlist add megaphone {{ greenlist|join(' ') }}"
+
+- name: Read config.yaml (to remove api.server)
+  ansible.builtin.slurp:
+    src: /etc/crowdsec/config.yaml
+  register: crowdsec_config_raw
+  when: ansible_host != primary_icinga_server_ip
+  tags: top
+
+- name: Parse and modify config
+  ansible.builtin.set_fact:
+    crowdsec_config: >-
+      {{
+        crowdsec_config_raw.content | b64decode | from_yaml
+        | ansible.utils.remove_keys(target=['server'])
+      }}
+  when: ansible_host != primary_icinga_server_ip
+  tags: top
+
+- name: Write modified config.yaml
+  ansible.builtin.copy:
+    content: "{{ crowdsec_config | to_nice_yaml }}"
+    dest: /etc/crowdsec/config.yaml
+    owner: root
+    group: root
+    mode: '0600'
+  notify: restart crowdsec
+  when: ansible_host != primary_icinga_server_ip
+  tags: top
+
+- name: Register with central LAPI
+  command: >
+    cscli lapi register
+    --machine "{{ fqdn }}"
+    --url "http://{{ primary_icinga_server }}:8080"
+  register: lapi_register
+  failed_when:
+    - lapi_register.rc != 0
+    - '"user already exist" not in lapi_register.stderr'
+  changed_when:
+    - lapi_register.rc == 0
+
+# On central server (run after)
+- name: Validate registered machines
+  command: cscli machines validate "{{ fqdn }}"
+  delegate_to: "{{ primary_icinga_server }}"
