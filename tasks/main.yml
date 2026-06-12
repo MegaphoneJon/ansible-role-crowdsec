@@ -63,9 +63,11 @@
   command:
     cmd: "cscli allowlist create megaphone --description 'Megaphone IPs'"
   failed_when: false
+  when: ansible_host == primary_icinga_server_ip
 
 - name: add allowlist IPs to crowdsec
   shell: "cscli allowlist add megaphone {{ greenlist|join(' ') }}"
+  when: ansible_host == primary_icinga_server_ip
 
 - name: Read config.yaml (to remove api.server)
   ansible.builtin.slurp:
