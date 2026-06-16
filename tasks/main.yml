@@ -107,8 +107,10 @@
     - '"user already exist" not in lapi_register.stderr'
   changed_when:
     - lapi_register.rc == 0
+  when: ansible_host != primary_icinga_server_ip
 
 # On central server (run after)
 - name: Validate registered machines
   command: cscli machines validate "{{ fqdn }}"
   delegate_to: "{{ primary_icinga_server }}"
+  when: ansible_host != primary_icinga_server_ip
