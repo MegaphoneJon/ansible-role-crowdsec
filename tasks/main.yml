@@ -54,11 +54,6 @@
     cmd: cscli hub upgrade 
   changed_when: false
 
-- name: Combine "users" and "additional users"
-  set_fact:
-    greenlist: "{{ greenlist_ips | union([ansible_host]) | union(additional_greenlist| default([])) }}"
-  tags: crowdtest
-
 - name: create allowlist
   command:
     cmd: "cscli allowlist create megaphone --description 'Megaphone IPs'"
@@ -66,15 +61,21 @@
   when: ansible_host == primary_icinga_server_ip
 
 - name: add allowlist IPs to crowdsec
-  shell: "cscli allowlist add megaphone {{ greenlist|join(' ') }}"
+  shell: "cscli allowlist add megaphone {{ greenlist_ips | union([ansible_host]) |join(' ') }}"
   when: ansible_host == primary_icinga_server_ip
+
+- name: Set server-specific allowlist parsers
+  template:
+    src: templates/megaphone-allowlist.yaml.j2
+    dest: /etc/crowdsec/parsers/s02-enrich/megaphone-allowlist.yaml
+  notify: restart crowdsec
+  tags: more_greenlist
 
 - name: Read config.yaml (to remove api.server)
   ansible.builtin.slurp:
     src: /etc/crowdsec/config.yaml
   register: crowdsec_config_raw
   when: ansible_host != primary_icinga_server_ip
-  tags: top
 
 - name: Parse and modify config
   ansible.builtin.set_fact:
@@ -84,7 +85,6 @@
         | ansible.utils.remove_keys(target=['server'])
       }}
   when: ansible_host != primary_icinga_server_ip
-  tags: top
 
 - name: Write modified config.yaml
   ansible.builtin.copy:
@@ -95,7 +95,6 @@
     mode: '0600'
   notify: restart crowdsec
   when: ansible_host != primary_icinga_server_ip
-  tags: top
 
 - name: Register with central LAPI
   command: >
