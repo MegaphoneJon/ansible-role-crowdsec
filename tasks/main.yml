@@ -1,3 +1,14 @@
+# These first two steps are until we move LM to a 64-bit server.
+- name: Determine dpkg's primary architecture
+  command: dpkg --print-architecture
+  register: dpkg_primary_arch
+  changed_when: false
+  check_mode: false
+
+- name: Set a clean boolean fact for reuse
+  set_fact:
+    is_i386_primary: "{{ dpkg_primary_arch.stdout == 'i386' }}"
+
 - name: Download (armored) GPG key
   ansible.builtin.get_url:
     url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
@@ -20,6 +31,7 @@
     update_cache: true
     name: crowdsec
     state: present
+  when: not is_i386_primary
   notify: restart crowdsec
 
 # Not sure why this works better when not installed simultaneously with crowdsec
@@ -28,6 +40,7 @@
     update_cache: true
     name: crowdsec-firewall-bouncer-nftables
     state: present
+  when: not is_i386_primary
   notify: restart crowdsec
 
 - name: Install custom scenarios
