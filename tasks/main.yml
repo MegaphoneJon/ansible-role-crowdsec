@@ -126,6 +126,7 @@
 - name: Validate registered machines
   command: cscli machines validate "{{ fqdn }}"
   when: ansible_host != primary_icinga_server_ip
+  delegate_to: "{{ primary_icinga_server }}"
 
 - name: Generate an LAPI key for the bouncer
   set_fact:
