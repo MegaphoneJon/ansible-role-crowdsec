@@ -1,7 +1,13 @@
 type: trigger
 name: MegaphoneJon/http-bot-mitigations
 description: "Blocks for specific bad bot behavior"
-filter: "evt.Meta.log_type == 'http_access-log' && (QueryUnescape(evt.Meta.http_path) contains QueryUnescape('amp%3Bamp%3B') || QueryUnescape(evt.Meta.http_path) matches '(//.*){2,}')"
+filter: |
+  evt.Meta.service == "http" && (
+    QueryUnescape(evt.Meta.http_path) contains QueryUnescape('amp%3Bamp%3B') ||
+    QueryUnescape(evt.Meta.http_path) matches '(//.*){2,}' ||
+    evt.Meta.http_path matches "/network" && not (evt.Meta.http_path matches "^/network/[0-9]+( |$)") ||
+    evt.Meta.http_path matches "/network" && evt.Meta.ASNNumber in ['22773', '35916', '6939']
+  )
 groupby: evt.Meta.source_ip
 blackhole: 5m
 labels:
