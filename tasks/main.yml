@@ -71,11 +71,11 @@
   command:
     cmd: "cscli allowlist create megaphone --description 'Megaphone IPs'"
   failed_when: false
-  when: ansible_host == primary_icinga_server_ip
+  when: ip4_address == primary_icinga_server_ip
 
 - name: add allowlist IPs to crowdsec
-  shell: "cscli allowlist add megaphone {{ greenlist_ips | union([ansible_host]) |join(' ') }}"
-  when: ansible_host == primary_icinga_server_ip
+  shell: "cscli allowlist add megaphone {{ greenlist_ips | union([ip4_address]) |join(' ') }}"
+  when: ip4_address == primary_icinga_server_ip
 
 - name: Set server-specific allowlist parsers
   template:
@@ -88,7 +88,7 @@
   ansible.builtin.slurp:
     src: /etc/crowdsec/config.yaml
   register: crowdsec_config_raw
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
 
 - name: Parse and modify config
   ansible.builtin.set_fact:
@@ -97,7 +97,7 @@
         crowdsec_config_raw.content | b64decode | from_yaml
         | ansible.utils.remove_keys(target=['server'])
       }}
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
 
 - name: Write modified config.yaml
   ansible.builtin.copy:
@@ -107,7 +107,7 @@
     group: root
     mode: '0600'
   notify: restart crowdsec
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
 
 - name: Register with central LAPI
   command: >
@@ -120,25 +120,25 @@
     - '"user already exist" not in lapi_register.stderr'
   changed_when:
     - lapi_register.rc == 0
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
 
 # On central server (run after)
 - name: Validate registered machines
   command: cscli machines validate "{{ fqdn }}"
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
   delegate_to: "{{ primary_icinga_server }}"
 
 - name: Generate an LAPI key for the bouncer
   set_fact:
     api_key: "{{ lookup('passwordstore', client + '/' + fqdn + '/crowdsec-lapi-key create=true length=32 nosymbols=yes') }}"
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
   tags: crowdsec-bouncer
   
 - name: Set the bouncer URL and API key
   template:
     src: templates/crowdsec-firewall-bouncer.yaml.local.j2
     dest: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml.local
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
   notify: restart crowdsec-bouncer
   tags: crowdsec-bouncer
 
@@ -151,5 +151,5 @@
   changed_when:
     - bouncer_register.rc == 0
   delegate_to: "{{ primary_icinga_server }}"
-  when: ansible_host != primary_icinga_server_ip
+  when: ip4_address != primary_icinga_server_ip
   tags: crowdsec-bouncer

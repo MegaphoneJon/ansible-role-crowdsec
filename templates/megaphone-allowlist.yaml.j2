@@ -2,4 +2,4 @@ name: megaphone/{{ client }}-allowlist
 description: "Server-specific whitelist for trusted IPs"
 whitelist:
   reason: "Trusted IPs for this server"
-  ip: {{ additional_greenlist|default([]) | union([ansible_host]) }}
+  ip: {{ additional_greenlist|default([]) | union([ip4_address]) }}
