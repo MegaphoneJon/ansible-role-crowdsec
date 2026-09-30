@@ -3,6 +3,7 @@ name: MegaphoneJon/http-bot-mitigations
 description: "Blocks for specific bad bot behavior"
 filter: |
   evt.Meta.service == "http" && (
+    (evt.Meta.http_path startsWith "wp-content/plugins" && Lower(evt.Meta.http_path) endsWith "readme.txt") ||
     QueryUnescape(evt.Meta.http_path) contains QueryUnescape('amp%3Bamp%3B') ||
     QueryUnescape(evt.Meta.http_path) matches '(//.*){2,}' ||
     evt.Meta.http_path matches "/network" && not (evt.Meta.http_path matches "^/network/[0-9]+( |$)") ||
